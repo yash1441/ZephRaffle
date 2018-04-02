@@ -1,6 +1,6 @@
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.0"
+#define PLUGIN_VERSION "1.1"
 
 #include <sourcemod>
 #include <sdktools>
@@ -22,6 +22,7 @@ int g_iAccountID[MAXPLAYERS + 1] = {-1, ...};
 Handle g_hJackpot = null;
 
 ConVar hConVar_JackpotTimer;
+ConVar hConVar_JackpotMsg;
 Handle hJackpotTimer;
 
 public Plugin myinfo = 
@@ -42,6 +43,7 @@ public void OnPluginStart()
 	HookEvent("round_end", Event_OnRoundEnd);
 	
 	hConVar_JackpotTimer = CreateConVar("sm_zeph_raffle_timer", "180.0", "Time in seconds.", FCVAR_NOTIFY, true, 1.0);
+	hConVar_JackpotMsg = CreateConVar("sm_zeph_raffle_mode", "1", "1 = Panel, 2 = Chat", FCVAR_NOTIFY, true, 1.0, true, 2.0);
 	HookConVarChange(hConVar_JackpotTimer, OnTimerChange);
 }
 
@@ -128,18 +130,25 @@ public Action Event_OnRoundEnd(Handle event, const char[] name, bool dontBroadca
 		FormatEx(sBuffer, sizeof(sBuffer), "Winner has left the game but won %d credits.", jackpot);
 	else FormatEx(sBuffer, sizeof(sBuffer), "%N has won %d credits.", winner, jackpot);
 	
-	Panel panel = new Panel();
-	panel.DrawItem(sBuffer);
-	
-	for (int i = 1; i <= MaxClients; i++)
+	if (GetConVarInt(hConVar_JackpotMsg) == 1)
 	{
-		if (IsClientInGame(i))
+		Panel panel = new Panel();
+		panel.DrawItem(sBuffer);
+		
+		for (int i = 1; i <= MaxClients; i++)
 		{
-			panel.Send(i, PanelHandle_Void, 5);
+			if (IsClientInGame(i))
+			{
+				panel.Send(i, PanelHandle_Void, 5);
+			}
 		}
+		
+		delete panel;
 	}
-	
-	delete panel;
+	else if (GetConVarInt(hConVar_JackpotMsg) == 2)
+	{
+		CPrintToChatAll("%s %s", CHAT_PREFIX, sBuffer);
+	}
 	
 	// Reset
 	LoopClients(i)
@@ -196,19 +205,26 @@ public Action Timer_Jackpot(Handle timer)
 	if(winner == -1 || !IsClientInGame(winner))
 		FormatEx(sBuffer, sizeof(sBuffer), "Winner has left the game but won %d credits.", jackpot);
 	else FormatEx(sBuffer, sizeof(sBuffer), "%N has won %d credits.", winner, jackpot);
-	
-	Panel panel = new Panel();
-	panel.DrawItem(sBuffer);
-	
-	for (int i = 1; i <= MaxClients; i++)
+
+	if (GetConVarInt(hConVar_JackpotMsg) == 1)
 	{
-		if (IsClientInGame(i))
+		Panel panel = new Panel();
+		panel.DrawItem(sBuffer);
+		
+		for (int i = 1; i <= MaxClients; i++)
 		{
-			panel.Send(i, PanelHandle_Void, 5);
+			if (IsClientInGame(i))
+			{
+				panel.Send(i, PanelHandle_Void, 5);
+			}
 		}
+		
+		delete panel;
 	}
-	
-	delete panel;
+	else if (GetConVarInt(hConVar_JackpotMsg) == 2)
+	{
+		CPrintToChatAll("%s %s", CHAT_PREFIX, sBuffer);
+	}
 	
 	// Reset
 	LoopClients(i)
@@ -290,18 +306,25 @@ public Action Cmd_Raffle(int client, int args)
 	char sBuffer[512];
 	FormatEx(sBuffer, sizeof(sBuffer), "%N\nhas spent %i credits\nhis current winning chance is: %.2f%\nJackpot: %i credits\nType !raffle to get your chance to win", client, credits, float(credits)/float(GetArraySize(g_hJackpot))*100.0, GetArraySize(g_hJackpot));
 	
-	Panel panel = new Panel();
-	panel.DrawItem(sBuffer);
-	
-	for (int i = 1; i <= MaxClients; i++)
+	if (GetConVarInt(hConVar_JackpotMsg) == 1)
 	{
-		if (IsClientInGame(i))
+		Panel panel = new Panel();
+		panel.DrawItem(sBuffer);
+		
+		for (int i = 1; i <= MaxClients; i++)
 		{
-			panel.Send(i, PanelHandle_Void, 5);
+			if (IsClientInGame(i))
+			{
+				panel.Send(i, PanelHandle_Void, 5);
+			}
 		}
+		
+		delete panel;
 	}
-	
-	delete panel;
+	else if (GetConVarInt(hConVar_JackpotMsg) == 2)
+	{
+		CPrintToChatAll("%s %s", CHAT_PREFIX, sBuffer);
+	}
 	
 	return Plugin_Handled;
 }
