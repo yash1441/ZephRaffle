@@ -304,10 +304,10 @@ public Action Cmd_Raffle(int client, int args)
 	//CPrintToChatAll("%s %N has spend %d credits, his current winning chance is: %.2f% (Jackpot: %d credits)", CHAT_PREFIX, client, credits, float(credits)/float(GetArraySize(g_hJackpot))*100.0, GetArraySize(g_hJackpot));
 	
 	char sBuffer[512];
-	FormatEx(sBuffer, sizeof(sBuffer), "%N\nhas spent %i credits\nhis current winning chance is: %.2f%\nJackpot: %i credits\nType !raffle to get your chance to win", client, credits, float(credits)/float(GetArraySize(g_hJackpot))*100.0, GetArraySize(g_hJackpot));
 	
 	if (GetConVarInt(hConVar_JackpotMsg) == 1)
 	{
+		FormatEx(sBuffer, sizeof(sBuffer), "%N\nhas spent %i credits\nhis current winning chance is: %.2f%\nJackpot: %i credits\nType !raffle to get your chance to win", client, credits, float(credits)/float(GetArraySize(g_hJackpot))*100.0, GetArraySize(g_hJackpot));
 		Panel panel = new Panel();
 		panel.DrawItem(sBuffer);
 		
@@ -323,7 +323,10 @@ public Action Cmd_Raffle(int client, int args)
 	}
 	else if (GetConVarInt(hConVar_JackpotMsg) == 2)
 	{
-		CPrintToChatAll("%s %s", CHAT_PREFIX, sBuffer);
+		CPrintToChatAll("%s %N\nhas spent %i credits", CHAT_PREFIX, client, credits);
+		CPrintToChatAll("%s his current winning chance is: %.2f%", CHAT_PREFIX, float(credits)/float(GetArraySize(g_hJackpot))*100.0);
+		CPrintToChatAll("%s Jackpot: %i credits", CHAT_PREFIX, GetArraySize(g_hJackpot));
+		CPrintToChatAll("%s Type !raffle to get your chance to win", CHAT_PREFIX, sBuffer);
 	}
 	
 	return Plugin_Handled;
