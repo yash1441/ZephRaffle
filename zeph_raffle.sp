@@ -7,7 +7,7 @@
 #include <store>
 #include <multicolors>
 
-#define MIN_CREDITS 100
+#define MIN_CREDITS 10
 #define MAX_CREDITS 50000
 
 #define CHAT_PREFIX "[Raffle]"
